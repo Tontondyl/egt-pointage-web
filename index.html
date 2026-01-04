@@ -3,707 +3,819 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#121212" />
   <title>EGT – Pointage</title>
   <style>
     :root{
-      --bg:#121212; --card:#1b1b1b; --muted:#bdbdbd; --text:#fff;
-      --blue:#1e88e5; --green:#43a047; --orange:#ff9800; --red:#e53935;
-      --border:#2a2a2a;
-      --radius:16px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --bg:#0b0b0d;
+      --card:#121216;
+      --card2:#0f0f12;
+      --text:#fff;
+      --muted:#b7b7c2;
+      --line:rgba(255,255,255,.08);
+      --blue:#1f86ff;
+      --green:#2ecc71;
+      --red:#ff4d4f;
+      --orange:#ff9f1a;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius:18px;
     }
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
     body{
-      margin:0; background:var(--bg); color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      padding: 16px;
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 50% -10%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(900px 600px at 10% 0%, rgba(31,134,255,.14), transparent 55%),
+        radial-gradient(900px 600px at 90% 10%, rgba(46,204,113,.10), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
     }
-    .wrap{max-width:520px;margin:0 auto;padding-bottom:32px}
-    .logo{display:flex;justify-content:center;margin-top:10px;margin-bottom:18px}
-    .logo img{width:170px;height:auto;object-fit:contain}
+    .wrap{ width:min(520px, 100%); }
     .card{
-      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-      padding:16px; box-shadow:var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
-    h1{font-size:18px;margin:0 0 12px 0}
-    label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+    .inner{ padding:22px; }
+    .top{
+      display:flex; align-items:center; gap:12px;
+      padding:18px 22px;
+      border-bottom:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+    }
+    .logo{
+      width:34px; height:34px;
+      border-radius:10px;
+      background: linear-gradient(135deg, rgba(31,134,255,.95), rgba(46,204,113,.85));
+      box-shadow: 0 10px 30px rgba(31,134,255,.22);
+      display:grid; place-items:center;
+      font-weight:800;
+    }
+    h1{ margin:0; font-size:16px; letter-spacing:.2px; }
+    .sub{ margin:0; color:var(--muted); font-size:12px; }
+    .grid{ display:grid; gap:12px; }
+    label{ font-size:12px; color:var(--muted); display:block; margin:0 0 6px; }
     input, select{
-      width:100%; padding:14px 12px; border-radius:12px;
-      border:1px solid var(--border); background:#0f0f0f; color:var(--text);
-      outline:none; font-size:16px;
+      width:100%;
+      height:48px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.35);
+      color:var(--text);
+      outline:none;
+      padding:0 14px;
+      font-size:15px;
     }
-    .row{display:flex;gap:10px}
-    .row > *{flex:1}
+    input::placeholder{ color:rgba(255,255,255,.35); }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .btn{
-      width:100%; padding:14px 12px; border:0; border-radius:12px;
-      font-size:16px; font-weight:700; color:#fff; cursor:pointer;
-      transition: transform .04s ease;
+      height:48px;
+      border:0;
+      border-radius:14px;
+      color:#fff;
+      font-weight:700;
+      letter-spacing:.2px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn:active{transform:scale(.99)}
-    .btn-blue{background:var(--blue)}
-    .btn-green{background:var(--green)}
-    .btn-gray{background:#2f2f2f;color:#fff}
-    .btn-red{background:var(--red)}
-    .muted{color:var(--muted);font-size:13px}
-    .status{
-      margin-top:14px; padding:12px; border-radius:12px;
-      background:#101010; border:1px solid var(--border);
-      color:#e0e0e0; white-space:pre-line;
-    }
-    .divider{height:1px;background:var(--border);margin:14px 0}
-    .pill{
-      display:inline-block; padding:6px 10px; border-radius:999px;
-      background:#101010; border:1px solid var(--border); color:var(--muted); font-size:12px;
-    }
-
-    /* HOLD PROGRESS */
-    .holdWrap{margin-top:10px}
-    .bar{
-      width:100%; height:8px; border-radius:999px; overflow:hidden;
-      background:#2a2a2a; border:1px solid #333;
-      display:none;
-    }
-    .bar > div{
-      width:0%; height:100%; background:var(--orange);
-      transition: width .04s linear;
-    }
-
-    /* Small helper */
+    .btn:disabled{ opacity:.45; cursor:not-allowed; }
+    .btn.blue{ background: linear-gradient(180deg, rgba(31,134,255,1), rgba(31,134,255,.80)); }
+    .btn.green{ background: linear-gradient(180deg, rgba(46,204,113,1), rgba(46,204,113,.82)); }
+    .btn.gray{ background: rgba(255,255,255,.10); border:1px solid var(--line); }
     .hint{
-      margin-top:8px;
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border: 1px dashed rgba(255,255,255,.18);
+      color: var(--muted);
       font-size:12px;
-      color:var(--muted);
       line-height:1.35;
     }
-    .hidden{display:none!important}
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.28);
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      min-height:46px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      margin-top:4px;
+      background: rgba(255,255,255,.25);
+      flex:0 0 10px;
+    }
+    .status.ok .dot{ background: var(--green); }
+    .status.err .dot{ background: var(--red); }
+    .status.warn .dot{ background: var(--orange); }
+    .status small{ color:var(--muted); display:block; margin-top:2px; }
+    .progressWrap{
+      margin-top:10px;
+      display:none;
+      height:8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .progressBar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--orange), rgba(255,159,26,.65));
+      transition: width .05s linear;
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.26);
+      border-radius:999px;
+      color: var(--muted);
+      font-size:12px;
+    }
+    .sep{ height:1px; background:var(--line); margin:16px 0; }
+    .hidden{ display:none !important; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="logo">
-      <!-- Mets ton logo dans /egt_logo.png à la racine du repo (ou change le src) -->
-      <img src="egt_logo.png" alt="EGT" onerror="this.style.display='none'">
+<div class="wrap">
+  <div class="card">
+    <div class="top">
+      <div class="logo">EGT</div>
+      <div>
+        <h1>EGT – Pointage</h1>
+        <p class="sub">Web (iPhone / Android) – Arrivée + Départ</p>
+      </div>
     </div>
 
     <!-- LOGIN -->
-    <div id="loginCard" class="card">
-      <h1>Connexion</h1>
-      <div class="muted">Connectez-vous avec votre identifiant ouvrier et mot de passe.</div>
+    <div id="viewLogin" class="inner">
+      <div class="grid">
+        <div>
+          <h2 style="margin:0 0 6px;font-size:18px;">Connexion</h2>
+          <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.35;">
+            Connectez-vous avec votre <b>ID ouvrier</b> (colonne A) et votre mot de passe.
+          </p>
+        </div>
 
-      <label for="loginId">ID ouvrier</label>
-      <input id="loginId" autocomplete="username" inputmode="text" placeholder="ex: 12" />
+        <div>
+          <label for="loginId">ID ouvrier</label>
+          <input id="loginId" inputmode="numeric" placeholder="ex: 1" autocomplete="username" />
+        </div>
 
-      <label for="loginPass">Mot de passe</label>
-      <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
+        <div>
+          <label for="loginPass">Mot de passe</label>
+          <input id="loginPass" type="password" placeholder="••••" autocomplete="current-password" />
+        </div>
 
-      <div class="divider"></div>
-      <button id="btnLogin" class="btn btn-blue">Se connecter</button>
+        <button id="btnLogin" class="btn blue">Se connecter</button>
 
-      <div class="status" id="loginStatus">—</div>
-      <div class="hint">
-        Astuce iPhone : si la géolocalisation est refusée, allez dans
-        <b>Réglages → Safari → Localisation</b> (ou Réglages → Confidentialité → Service de localisation).
+        <div id="loginStatus" class="status hidden">
+          <div class="dot"></div>
+          <div>
+            <div id="loginStatusText">—</div>
+            <small id="loginStatusSmall">—</small>
+          </div>
+        </div>
+
+        <div class="hint">
+          <b>Astuce iPhone</b> : si la géolocalisation est refusée, allez dans
+          <b>Réglages → Safari → Localisation</b> (ou <b>Réglages → Confidentialité → Service de localisation</b>).
+        </div>
       </div>
     </div>
 
-    <!-- APP -->
-    <div id="appCard" class="card hidden">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <div>
-          <div class="pill" id="pillUser">Ouvrier : -</div>
-          <div class="muted" id="pillAdr" style="margin-top:6px">Adresse : -</div>
+    <!-- POINTAGE -->
+    <div id="viewPointage" class="inner hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div class="pill">
+          <span>Ouvrier :</span>
+          <b id="whoName">-</b>
+          <span class="mono" id="whoId">(ID -)</span>
         </div>
-        <button id="btnLogout" class="btn btn-gray" style="width:auto;padding:10px 12px">Déconnexion</button>
+        <button id="btnLogout" class="btn gray" style="height:38px;border-radius:12px;padding:0 12px;">Déconnexion</button>
       </div>
 
-      <div class="divider"></div>
+      <div class="sep"></div>
 
-      <h1>Pointage</h1>
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label>Véhicule arrivée</label>
+            <select id="vehArr"></select>
+            <div style="margin-top:8px;color:var(--muted);font-size:12px;">
+              Plaque arrivée : <b id="plaqueArr">-</b>
+            </div>
+          </div>
+          <div>
+            <label>Véhicule départ</label>
+            <select id="vehDep" disabled></select>
+            <div style="margin-top:8px;color:var(--muted);font-size:12px;">
+              Plaque départ : <b id="plaqueDep">-</b>
+            </div>
+          </div>
+        </div>
 
-      <label>Véhicule arrivée</label>
-      <select id="vehArr"></select>
-      <div class="muted" id="plaqueArr" style="margin-top:6px">Plaque arrivée : -</div>
+        <div class="progressWrap" id="progressWrap">
+          <div class="progressBar" id="progressBar"></div>
+        </div>
 
-      <label style="margin-top:16px">Véhicule départ</label>
-      <select id="vehDep"></select>
-      <div class="muted" id="plaqueDep" style="margin-top:6px">Plaque départ : -</div>
+        <div class="row">
+          <button id="btnArrivee" class="btn blue">Arrivée (maintenir 3s)</button>
+          <button id="btnDepart" class="btn green">Départ (maintenir 3s)</button>
+        </div>
 
-      <div class="divider"></div>
+        <div id="status" class="status">
+          <div class="dot"></div>
+          <div>
+            <div id="statusText">Prêt.</div>
+            <small id="statusSmall">Sélectionne les véhicules puis valide l’arrivée.</small>
+          </div>
+        </div>
 
-      <div class="row">
-        <button id="btnArrivee" class="btn btn-blue">Arrivée (maintenir)</button>
-        <button id="btnDepart" class="btn btn-green">Départ (maintenir)</button>
+        <div class="hint">
+          La ligne est envoyée au serveur <b>uniquement au départ</b> (arrivée stockée localement entre-temps).
+          <br/>Si le serveur répond <b>DUPLICATE_POINTAGE</b>, la journée est verrouillée (“déjà envoyé”).
+        </div>
       </div>
-
-      <div class="holdWrap">
-        <div class="bar" id="holdBar"><div id="holdFill"></div></div>
-        <div class="hint" id="holdHint">Maintiens 3 secondes pour valider.</div>
-      </div>
-
-      <div class="status" id="appStatus">—</div>
     </div>
   </div>
+</div>
 
-  <script>
-    /************** CONFIG **************/
-    // Ton URL Apps Script (celle que tu as dans Android)
-    const API_URL = "https://script.google.com/macros/s/AKfycbyAGwr3dCcXbf9XcuaovU2mtRGtW8aQFHY88iL8hvCMmled1YmOoOivb2ITTr8toYBL/exec";
+<script>
+  // =====================================================
+  // CONFIG
+  // =====================================================
+  const API_URL = "https://script.google.com/macros/s/AKfycbyAGwr3dCcXbf9XcuaovU2mtRGtW8aQFHY88iL8hvCMmled1YmOoOivb2ITTr8toYBL/exec";
+  const HOLD_MS = 3000;
 
-    // HOLD
-    const HOLD_MS = 3000;
-    const TICK_MS = 33;
+  // Storage keys
+  const LS_USER = "egt_user_v1";             // {id, nom, adresse}
+  const LS_ARR  = "egt_arrivee_v1";          // arrival payload stored until depart
+  const LS_SENT = "egt_sent_v1";             // { "<id>|<yyyy-mm-dd>": true }
 
-    // Storage keys
-    const LS_USER = "egt_user";
-    const LS_ARRIVEE_JSON = "egt_arrivee_json";
-    const LS_ARRIVEE_VAL = "egt_arrivee_validee";
-    const LS_LAST_SEND_DATE = "egt_last_send_date";
+  // =====================================================
+  // DOM
+  // =====================================================
+  const viewLogin = document.getElementById("viewLogin");
+  const viewPointage = document.getElementById("viewPointage");
 
-    /************** HELPERS **************/
-    const $ = (id) => document.getElementById(id);
+  const loginId = document.getElementById("loginId");
+  const loginPass = document.getElementById("loginPass");
+  const btnLogin = document.getElementById("btnLogin");
+  const loginStatus = document.getElementById("loginStatus");
+  const loginStatusText = document.getElementById("loginStatusText");
+  const loginStatusSmall = document.getElementById("loginStatusSmall");
 
-    function todayStr(){
-      const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,'0');
-      const dd = String(d.getDate()).padStart(2,'0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-    function timeStr(){
-      const d = new Date();
-      const hh = String(d.getHours()).padStart(2,'0');
-      const mi = String(d.getMinutes()).padStart(2,'0');
-      return `${hh}:${mi}`;
-    }
+  const whoName = document.getElementById("whoName");
+  const whoId = document.getElementById("whoId");
+  const btnLogout = document.getElementById("btnLogout");
 
-    function setStatus(el, msg){ el.textContent = msg || "—"; }
+  const vehArr = document.getElementById("vehArr");
+  const vehDep = document.getElementById("vehDep");
+  const plaqueArr = document.getElementById("plaqueArr");
+  const plaqueDep = document.getElementById("plaqueDep");
 
-    function safeJsonParse(s){
-      try{ return JSON.parse(s); } catch(e){ return null; }
-    }
+  const btnArrivee = document.getElementById("btnArrivee");
+  const btnDepart = document.getElementById("btnDepart");
 
-    // GET JSON via fetch
-    async function getJson(url){
-      const r = await fetch(url, { method:"GET", cache:"no-store" });
-      const txt = await r.text();
-      // Apps Script renvoie JSON
-      let obj = null;
-      try{ obj = JSON.parse(txt); } catch(e){
-        throw new Error("Réponse non JSON : " + txt.slice(0,200));
+  const statusBox = document.getElementById("status");
+  const statusText = document.getElementById("statusText");
+  const statusSmall = document.getElementById("statusSmall");
+
+  const progressWrap = document.getElementById("progressWrap");
+  const progressBar = document.getElementById("progressBar");
+
+  // In-memory state
+  let currentUser = null;
+  let vehicules = []; // [{id, nom, plaque, ...}]
+  let holdingTimer = null;
+  let holdingStart = 0;
+  let holdingWhich = null; // "arr" or "dep"
+  let isSending = false;
+
+  // =====================================================
+  // Helpers
+  // =====================================================
+  function todayISO(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  function timeHM(){
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return `${hh}:${mm}`;
+  }
+  function setStatus(type, main, small=""){
+    statusBox.classList.remove("ok","err","warn");
+    if(type) statusBox.classList.add(type);
+    statusText.textContent = main || "";
+    statusSmall.textContent = small || "";
+  }
+  function setLoginStatus(type, main, small=""){
+    loginStatus.classList.remove("hidden","ok","err","warn");
+    loginStatus.classList.remove("ok","err","warn");
+    if(type) loginStatus.classList.add(type);
+    loginStatusText.textContent = main || "";
+    loginStatusSmall.textContent = small || "";
+  }
+  function clearLoginStatus(){
+    loginStatus.classList.add("hidden");
+  }
+
+  function lsGet(key){
+    try { return JSON.parse(localStorage.getItem(key) || "null"); } catch(e){ return null; }
+  }
+  function lsSet(key, val){
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+  function lsDel(key){
+    localStorage.removeItem(key);
+  }
+
+  // JSONP GET (bypass CORS for GitHub Pages)
+  function jsonp(params){
+    return new Promise((resolve, reject) => {
+      const cb = "cb_" + Math.random().toString(36).slice(2);
+      const url = new URL(API_URL);
+      Object.entries(params || {}).forEach(([k,v]) => url.searchParams.set(k, v));
+
+      url.searchParams.set("callback", cb);
+
+      const script = document.createElement("script");
+      script.src = url.toString();
+      script.async = true;
+
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error("Timeout réseau"));
+      }, 20000);
+
+      function cleanup(){
+        clearTimeout(timeout);
+        delete window[cb];
+        script.remove();
       }
-      if (!r.ok) throw new Error("HTTP " + r.status + " : " + txt);
-      return obj;
+
+      window[cb] = (data) => {
+        cleanup();
+        resolve(data);
+      };
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error("Erreur réseau / script"));
+      };
+
+      document.body.appendChild(script);
+    });
+  }
+
+  function getSelectedVeh(selectEl){
+    const idx = selectEl.selectedIndex;
+    if(idx < 0 || idx >= vehicules.length) return null;
+    return vehicules[idx];
+  }
+
+  function refreshPlaques(){
+    const a = getSelectedVeh(vehArr);
+    const d = getSelectedVeh(vehDep);
+    plaqueArr.textContent = a?.plaque || "-";
+    plaqueDep.textContent = d?.plaque || "-";
+  }
+
+  function dayKey(){
+    if(!currentUser?.id) return null;
+    return `${currentUser.id}|${todayISO()}`;
+  }
+
+  function isDaySent(){
+    const sent = lsGet(LS_SENT) || {};
+    const key = dayKey();
+    return key ? !!sent[key] : false;
+  }
+
+  function markDaySent(){
+    const sent = lsGet(LS_SENT) || {};
+    const key = dayKey();
+    if(key){
+      sent[key] = true;
+      lsSet(LS_SENT, sent);
+    }
+  }
+
+  function lockUI(){
+    // if already sent today -> disable everything
+    const sent = isDaySent();
+    const arrSaved = lsGet(LS_ARR);
+
+    if(sent){
+      vehArr.disabled = true;
+      vehDep.disabled = true;
+      btnArrivee.disabled = true;
+      btnDepart.disabled = true;
+      setStatus("ok", "Pointage déjà envoyé aujourd’hui ✔", "Rien à faire.");
+      return;
     }
 
-    // POST JSON via fetch (Android-like)
-    async function postJson(url, payload){
-      const r = await fetch(url, {
-        method:"POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
-      });
-      const txt = await r.text();
-      let obj = null;
-      try{ obj = JSON.parse(txt); } catch(e){
-        throw new Error("Réponse non JSON : " + txt.slice(0,200));
+    if(arrSaved){
+      // arrival done locally
+      vehArr.disabled = true;
+      btnArrivee.disabled = true;
+
+      vehDep.disabled = false;
+      btnDepart.disabled = false;
+
+      setStatus("warn", "Arrivée enregistrée (local).", "Valide le départ pour envoyer.");
+    } else {
+      vehArr.disabled = false;
+      btnArrivee.disabled = false;
+
+      vehDep.disabled = true;
+      btnDepart.disabled = false; // bouton gère message
+      setStatus("", "Prêt.", "Sélectionne les véhicules puis valide l’arrivée.");
+    }
+  }
+
+  // =====================================================
+  // GEOLOCATION
+  // =====================================================
+  function getLocation(){
+    return new Promise((resolve, reject) => {
+      if(!navigator.geolocation){
+        reject(new Error("Géolocalisation non supportée"));
+        return;
       }
-      if (!r.ok) throw new Error("HTTP " + r.status + " : " + txt);
-      return obj;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          acc: pos.coords.accuracy
+        }),
+        (err) => {
+          let msg = "Localisation refusée";
+          if(err && err.message) msg = err.message;
+          reject(new Error(msg));
+        },
+        { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+      );
+    });
+  }
+
+  // =====================================================
+  // API calls
+  // =====================================================
+  async function apiLogin(id, password){
+    return await jsonp({ type:"login", id, password });
+  }
+  async function apiVehicules(){
+    return await jsonp({ type:"vehicule" });
+  }
+  async function apiSendPointage(payloadObj){
+    // server expects GET type=pointage_web&payload=<encoded json>
+    const payload = encodeURIComponent(JSON.stringify(payloadObj));
+    return await jsonp({ type:"pointage_web", payload });
+  }
+
+  // =====================================================
+  // HOLD BUTTON (3 seconds)
+  // =====================================================
+  function startHold(which){
+    if(isSending) return;
+
+    // guard
+    if(which === "dep"){
+      const arr = lsGet(LS_ARR);
+      if(!arr){
+        setStatus("warn", "Commence par valider l’arrivée.", "Arrivée manquante.");
+        return;
+      }
+      if(isDaySent()){
+        setStatus("ok", "Déjà envoyé aujourd’hui ✔", "Journée verrouillée.");
+        return;
+      }
+    }
+    if(which === "arr"){
+      if(isDaySent()){
+        setStatus("ok", "Déjà envoyé aujourd’hui ✔", "Journée verrouillée.");
+        return;
+      }
+      if(lsGet(LS_ARR)){
+        setStatus("warn", "Arrivée déjà enregistrée.", "Valide le départ.");
+        return;
+      }
     }
 
-    function getCurrentLocation(){
-      return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-          reject(new Error("Géolocalisation non supportée."));
-          return;
-        }
-        navigator.geolocation.getCurrentPosition(
-          (pos) => resolve({
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude,
-            acc: pos.coords.accuracy
-          }),
-          (err) => reject(new Error("Géoloc refusée/indispo : " + (err.message || err.code))),
-          { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
-        );
-      });
+    holdingWhich = which;
+    holdingStart = Date.now();
+    progressWrap.style.display = "block";
+    progressBar.style.width = "0%";
+
+    // tick animation
+    const tick = () => {
+      const elapsed = Date.now() - holdingStart;
+      const pct = Math.min(100, (elapsed / HOLD_MS) * 100);
+      progressBar.style.width = pct + "%";
+      if(elapsed >= HOLD_MS){
+        finishHold();
+      } else {
+        holdingTimer = requestAnimationFrame(tick);
+      }
+    };
+    holdingTimer = requestAnimationFrame(tick);
+  }
+
+  function cancelHold(){
+    if(holdingTimer){
+      cancelAnimationFrame(holdingTimer);
+      holdingTimer = null;
     }
+    progressBar.style.width = "0%";
+    progressWrap.style.display = "none";
+    holdingWhich = null;
+  }
 
-    /************** STATE **************/
-    let user = null; // {id, nom, adresse}
-    let vehicules = []; // {id, nom, plaque}
-    let arriveeValidee = false;
-    let pointageDuJour = null; // objet JSON (arrivée)
-
-    let alreadySentToday = false;
-
-    let isSendingArr = false;
-    let isSendingDep = false;
-
-    /************** UI INIT **************/
-    const loginCard = $("loginCard");
-    const appCard = $("appCard");
-    const loginStatus = $("loginStatus");
-    const appStatus = $("appStatus");
-
-    const vehArr = $("vehArr");
-    const vehDep = $("vehDep");
-    const plaqueArr = $("plaqueArr");
-    const plaqueDep = $("plaqueDep");
-
-    const btnLogin = $("btnLogin");
-    const btnLogout = $("btnLogout");
-    const btnArrivee = $("btnArrivee");
-    const btnDepart = $("btnDepart");
-
-    const holdBar = $("holdBar");
-    const holdFill = $("holdFill");
-    const holdHint = $("holdHint");
-
-    function showLogin(){
-      loginCard.classList.remove("hidden");
-      appCard.classList.add("hidden");
+  async function finishHold(){
+    if(holdingTimer){
+      cancelAnimationFrame(holdingTimer);
+      holdingTimer = null;
     }
-    function showApp(){
-      loginCard.classList.add("hidden");
-      appCard.classList.remove("hidden");
-    }
+    progressBar.style.width = "100%";
+    setTimeout(() => { progressWrap.style.display = "none"; }, 120);
 
-    function updateBadges(){
-      $("pillUser").textContent = `Ouvrier : ${user?.nom || "-"}`;
-      $("pillAdr").textContent = `Adresse : ${user?.adresse || "-"}`;
-    }
+    const which = holdingWhich;
+    holdingWhich = null;
 
-    function setVehOptions(){
+    if(which === "arr") await doArrivee();
+    if(which === "dep") await doDepart();
+  }
+
+  function bindHold(btn, which){
+    const down = (e) => { e.preventDefault(); startHold(which); };
+    const up   = (e) => { e.preventDefault(); if(holdingWhich){ setStatus("warn","Appui trop court.", "Maintiens 3 secondes."); } cancelHold(); };
+
+    // pointer events (works on iOS/Android/desktop)
+    btn.addEventListener("pointerdown", down);
+    btn.addEventListener("pointerup", up);
+    btn.addEventListener("pointercancel", up);
+    btn.addEventListener("pointerleave", up);
+  }
+
+  // =====================================================
+  // ARRIVEE / DEPART logic
+  // =====================================================
+  async function doArrivee(){
+    if(isSending) return;
+    isSending = true;
+    try{
+      setStatus("", "Localisation de l’arrivée…", "Active le GPS si nécessaire.");
+
+      const vA = getSelectedVeh(vehArr);
+      if(!vA){
+        setStatus("err","Aucun véhicule sélectionné.", "Choisis un véhicule arrivée.");
+        return;
+      }
+
+      const loc = await getLocation();
+
+      const arrPayload = {
+        ouvrier_id: String(currentUser.id),
+        ouvrier_nom: String(currentUser.nom || ""),
+        ouvrier_adresse: String(currentUser.adresse || ""),
+        date_jour: todayISO(),
+        heure_arrivee: timeHM(),
+        lat_arrivee: loc.lat,
+        lon_arrivee: loc.lon,
+        vehicule_arrivee_nom: vA.nom || "",
+        vehicule_arrivee_plaque: vA.plaque || "",
+        // compat
+        vehicule_nom: vA.nom || "",
+        vehicule_plaque: vA.plaque || ""
+      };
+
+      lsSet(LS_ARR, arrPayload);
+
+      setStatus("ok", "Arrivée validée ✔", "Véhicule arrivée figé. Fais le départ pour envoyer.");
+      lockUI();
+
+    }catch(err){
+      setStatus("err", "Erreur arrivée", err.message || String(err));
+    }finally{
+      isSending = false;
+    }
+  }
+
+  async function doDepart(){
+    if(isSending) return;
+    isSending = true;
+    try{
+      const arr = lsGet(LS_ARR);
+      if(!arr){
+        setStatus("warn","Arrivée manquante.", "Revalide l’arrivée.");
+        return;
+      }
+
+      setStatus("", "Localisation du départ…", "Active le GPS si nécessaire.");
+
+      const vD = getSelectedVeh(vehDep);
+      if(!vD){
+        setStatus("err","Aucun véhicule sélectionné.", "Choisis un véhicule départ.");
+        return;
+      }
+
+      const loc = await getLocation();
+
+      const payload = {
+        ...arr,
+        heure_depart: timeHM(),
+        lat_depart: loc.lat,
+        lon_depart: loc.lon,
+        vehicule_depart_nom: vD.nom || "",
+        vehicule_depart_plaque: vD.plaque || ""
+      };
+
+      setStatus("", "Envoi du pointage…", "Connexion au serveur.");
+
+      const res = await apiSendPointage(payload);
+
+      // res: {status, code, message, data}
+      const st = (res && (res.status || "")).toLowerCase();
+      const code = (res && (res.code || "")).toUpperCase();
+      const msg = (res && (res.message || "")) || "";
+
+      if(st === "duplicate" || code === "DUPLICATE_POINTAGE"){
+        // serveur dit déjà enregistré
+        markDaySent();
+        lsDel(LS_ARR);
+        setStatus("ok", "Déjà envoyé aujourd’hui ✔", "Journée verrouillée.");
+        lockUI();
+        return;
+      }
+
+      if(st !== "ok"){
+        setStatus("err", "Erreur serveur", msg || ("Code: " + code));
+        return;
+      }
+
+      // OK
+      markDaySent();
+      lsDel(LS_ARR);
+      setStatus("ok", "Pointage envoyé ✔", "Merci.");
+      lockUI();
+
+    }catch(err){
+      setStatus("err", "Erreur départ / envoi", err.message || String(err));
+    }finally{
+      isSending = false;
+    }
+  }
+
+  // =====================================================
+  // UI flow
+  // =====================================================
+  async function initAfterLogin(){
+    whoName.textContent = currentUser.nom || "-";
+    whoId.textContent = `(ID ${currentUser.id || "-"})`;
+
+    // load vehicules
+    setStatus("", "Chargement des véhicules…", "");
+    try{
+      const res = await apiVehicules();
+      if((res.status || "").toLowerCase() !== "ok"){
+        throw new Error(res.message || "Erreur chargement véhicules");
+      }
+      vehicules = res.data || [];
       vehArr.innerHTML = "";
       vehDep.innerHTML = "";
       vehicules.forEach(v => {
-        const o1 = document.createElement("option");
-        o1.value = v.id || v.nom;
-        o1.textContent = v.nom;
-        o1.dataset.plaque = v.plaque || "";
-        o1.dataset.nom = v.nom || "";
-        vehArr.appendChild(o1);
+        const optA = document.createElement("option");
+        optA.textContent = v.nom || "-";
+        vehArr.appendChild(optA);
 
-        const o2 = document.createElement("option");
-        o2.value = v.id || v.nom;
-        o2.textContent = v.nom;
-        o2.dataset.plaque = v.plaque || "";
-        o2.dataset.nom = v.nom || "";
-        vehDep.appendChild(o2);
+        const optD = document.createElement("option");
+        optD.textContent = v.nom || "-";
+        vehDep.appendChild(optD);
       });
 
-      // defaults
-      if (vehicules.length){
-        vehArr.selectedIndex = 0;
-        vehDep.selectedIndex = 0;
-        updatePlaques();
-      } else {
-        plaqueArr.textContent = "Plaque arrivée : -";
-        plaqueDep.textContent = "Plaque départ : -";
-      }
-    }
+      refreshPlaques();
 
-    function selectedVeh(selectEl){
-      const opt = selectEl.options[selectEl.selectedIndex];
-      if (!opt) return null;
-      return {
-        nom: opt.dataset.nom || opt.textContent || "",
-        plaque: opt.dataset.plaque || ""
-      };
-    }
-
-    function updatePlaques(){
-      const a = selectedVeh(vehArr);
-      const d = selectedVeh(vehDep);
-      plaqueArr.textContent = "Plaque arrivée : " + (a?.plaque || "-");
-      plaqueDep.textContent = "Plaque départ : " + (d?.plaque || "-");
-    }
-
-    vehArr.addEventListener("change", updatePlaques);
-    vehDep.addEventListener("change", updatePlaques);
-
-    function clearHoldUI(){
-      holdBar.style.display = "none";
-      holdFill.style.width = "0%";
-    }
-
-    function updateLockUI(){
-      // déjà envoyé aujourd'hui -> tout bloqué
-      if (alreadySentToday){
-        btnArrivee.disabled = true;
-        btnDepart.disabled = true;
-        vehArr.disabled = true;
-        vehDep.disabled = true;
-        holdHint.textContent = "Pointage déjà envoyé aujourd'hui.";
-        return;
+      // if arrival saved -> preselect that arrival vehicle
+      const arr = lsGet(LS_ARR);
+      if(arr?.vehicule_arrivee_nom){
+        const idx = vehicules.findIndex(v => String(v.nom).toLowerCase() === String(arr.vehicule_arrivee_nom).toLowerCase());
+        if(idx >= 0) vehArr.selectedIndex = idx;
       }
 
-      if (!arriveeValidee){
-        btnArrivee.disabled = false;
-        btnDepart.disabled = false; // on laisse, mais on affichera le message
-        vehArr.disabled = false;
-        vehDep.disabled = true;
-        holdHint.textContent = "Maintiens 3 secondes pour valider.";
-        return;
-      }
+      refreshPlaques();
+      lockUI();
 
-      // arrivée faite -> figer vehArr
-      btnArrivee.disabled = true;
-      vehArr.disabled = true;
+    }catch(err){
+      setStatus("err", "Impossible de charger les véhicules", err.message || String(err));
+    }
+  }
 
-      btnDepart.disabled = false;
-      vehDep.disabled = false;
-      holdHint.textContent = "Maintiens 3 secondes pour valider le départ.";
+  function showPointage(){
+    viewLogin.classList.add("hidden");
+    viewPointage.classList.remove("hidden");
+  }
+  function showLogin(){
+    viewPointage.classList.add("hidden");
+    viewLogin.classList.remove("hidden");
+  }
+
+  function logout(){
+    lsDel(LS_USER);
+    currentUser = null;
+    // On ne supprime pas LS_ARR / LS_SENT ici (si tu veux garder)
+    showLogin();
+    clearLoginStatus();
+  }
+
+  // =====================================================
+  // Events
+  // =====================================================
+  vehArr.addEventListener("change", refreshPlaques);
+  vehDep.addEventListener("change", refreshPlaques);
+
+  btnLogout.addEventListener("click", logout);
+
+  btnLogin.addEventListener("click", async () => {
+    const id = (loginId.value || "").trim();
+    const pass = (loginPass.value || "").trim();
+    clearLoginStatus();
+
+    if(!id || !pass){
+      setLoginStatus("warn", "Champs manquants", "Saisis ID ouvrier + mot de passe.");
+      return;
     }
 
-    /************** PERSISTENCE **************/
-    function loadPersisted(){
-      // already sent
-      const last = localStorage.getItem(LS_LAST_SEND_DATE) || "";
-      if (last === todayStr()){
-        alreadySentToday = true;
-        localStorage.removeItem(LS_ARRIVEE_JSON);
-        localStorage.removeItem(LS_ARRIVEE_VAL);
-      }
+    btnLogin.disabled = true;
+    setLoginStatus("", "Connexion…", "Vérification des identifiants.");
 
-      // user
-      const u = safeJsonParse(localStorage.getItem(LS_USER) || "");
-      if (u && u.id && u.nom){
-        user = u;
-      }
+    try{
+      const res = await apiLogin(id, pass);
 
-      // arrivée
-      const aVal = localStorage.getItem(LS_ARRIVEE_VAL) === "1";
-      const aJson = safeJsonParse(localStorage.getItem(LS_ARRIVEE_JSON) || "");
-      if (aVal && aJson){
-        arriveeValidee = true;
-        pointageDuJour = aJson;
-      }
-    }
-
-    function saveArrivee(){
-      localStorage.setItem(LS_ARRIVEE_VAL, arriveeValidee ? "1" : "0");
-      localStorage.setItem(LS_ARRIVEE_JSON, pointageDuJour ? JSON.stringify(pointageDuJour) : "");
-    }
-
-    function clearArrivee(){
-      arriveeValidee = false;
-      pointageDuJour = null;
-      localStorage.removeItem(LS_ARRIVEE_VAL);
-      localStorage.removeItem(LS_ARRIVEE_JSON);
-    }
-
-    /************** API CALLS **************/
-    async function apiLogin(id, password){
-      const url = new URL(API_URL);
-      url.searchParams.set("type", "login");
-      url.searchParams.set("id", id);
-      url.searchParams.set("password", password);
-      return await getJson(url.toString());
-    }
-
-    async function apiVehicules(){
-      const url = new URL(API_URL);
-      url.searchParams.set("type", "vehicule");
-      return await getJson(url.toString());
-    }
-
-    async function apiPointageSave(payload){
-      // Web peut faire POST aussi (plus simple)
-      return await postJson(API_URL, payload);
-      // (Alternative GET pointage_web + payload=... si tu veux absolument éviter POST)
-    }
-
-    /************** LOGIN FLOW **************/
-    btnLogin.addEventListener("click", async () => {
-      const id = $("loginId").value.trim();
-      const pass = $("loginPass").value.trim();
-
-      if (!id || !pass){
-        setStatus(loginStatus, "⚠️ Entre ID + mot de passe.");
-        return;
-      }
-
-      btnLogin.disabled = true;
-      setStatus(loginStatus, "Connexion...");
-      try{
-        const res = await apiLogin(id, pass);
-        if (res.status !== "ok"){
-          setStatus(loginStatus, "❌ " + (res.message || "Connexion impossible"));
-          btnLogin.disabled = false;
-          return;
-        }
-
-        user = res.data;
-        localStorage.setItem(LS_USER, JSON.stringify(user));
-
-        setStatus(loginStatus, "✅ Connecté.");
-        showApp();
-        updateBadges();
-
-        // load vehicles
-        setStatus(appStatus, "Chargement des véhicules...");
-        const v = await apiVehicules();
-        if (v.status !== "ok"){
-          setStatus(appStatus, "❌ " + (v.message || "Erreur véhicules"));
-        } else {
-          vehicules = v.data || [];
-          setVehOptions();
-          // si arrivée restaurée : reselection véhicule arrivée
-          if (arriveeValidee && pointageDuJour?.vehicule_arrivee_nom){
-            const name = pointageDuJour.vehicule_arrivee_nom;
-            const idx = vehicules.findIndex(x => (x.nom || "").toLowerCase() === String(name).toLowerCase());
-            if (idx >= 0) vehArr.selectedIndex = idx;
-            updatePlaques();
-          }
-          setStatus(appStatus, alreadySentToday
-            ? "✅ Pointage déjà envoyé aujourd'hui."
-            : (arriveeValidee ? "Arrivée restaurée. Tu peux faire le départ." : "Prêt."));
-        }
-
-        updateLockUI();
-
-      } catch(err){
-        setStatus(loginStatus, "❌ " + err.message);
-      } finally{
+      if((res.status || "").toLowerCase() !== "ok"){
+        setLoginStatus("err", "Identifiants incorrects", res.message || "");
         btnLogin.disabled = false;
+        return;
       }
-    });
 
-    btnLogout.addEventListener("click", () => {
-      user = null;
-      vehicules = [];
-      clearArrivee();
-      localStorage.removeItem(LS_USER);
-      setStatus(appStatus, "—");
-      setStatus(loginStatus, "—");
+      currentUser = res.data || { id, nom:"", adresse:"" };
+      lsSet(LS_USER, currentUser);
+
+      setLoginStatus("ok", "Connexion OK ✔", "");
+      showPointage();
+      await initAfterLogin();
+
+    }catch(err){
+      setLoginStatus("err", "Erreur connexion", err.message || String(err));
+    }finally{
+      btnLogin.disabled = false;
+    }
+  });
+
+  // bind hold buttons
+  bindHold(btnArrivee, "arr");
+  bindHold(btnDepart, "dep");
+
+  // =====================================================
+  // Boot: auto login if stored
+  // =====================================================
+  (function boot(){
+    const u = lsGet(LS_USER);
+    if(u && u.id){
+      currentUser = u;
+      showPointage();
+      initAfterLogin();
+    } else {
       showLogin();
-    });
-
-    /************** HOLD HANDLER **************/
-    function setupHold(button, kind){ // kind: "arr" or "dep"
-      let timer = null;
-      let tick = null;
-      let start = 0;
-      let triggered = false;
-
-      const startHold = async () => {
-        if (alreadySentToday){
-          setStatus(appStatus, "✅ Pointage déjà envoyé aujourd'hui.");
-          return;
-        }
-
-        if (kind === "arr" && arriveeValidee){
-          setStatus(appStatus, "Arrivée déjà validée.");
-          return;
-        }
-        if (kind === "dep" && !arriveeValidee){
-          setStatus(appStatus, "Commence par valider l'arrivée.");
-          return;
-        }
-
-        if (kind === "arr" && isSendingArr) return;
-        if (kind === "dep" && isSendingDep) return;
-
-        triggered = false;
-        start = Date.now();
-        holdBar.style.display = "block";
-        holdFill.style.width = "0%";
-
-        setStatus(appStatus, (kind === "arr")
-          ? "Maintiens 3 secondes pour valider l'arrivée…"
-          : "Maintiens 3 secondes pour valider le départ…");
-
-        tick = setInterval(() => {
-          const elapsed = Date.now() - start;
-          const p = Math.min(1, elapsed / HOLD_MS);
-          holdFill.style.width = (p * 100).toFixed(1) + "%";
-        }, TICK_MS);
-
-        timer = setTimeout(async () => {
-          triggered = true;
-          clearInterval(tick); tick = null;
-          clearTimeout(timer); timer = null;
-          holdFill.style.width = "100%";
-          setTimeout(clearHoldUI, 120);
-
-          if (kind === "arr") await actionArrivee();
-          else await actionDepart();
-
-        }, HOLD_MS);
-      };
-
-      const cancelHold = () => {
-        if (triggered) return; // action already launched
-        if (timer){ clearTimeout(timer); timer = null; }
-        if (tick){ clearInterval(tick); tick = null; }
-        clearHoldUI();
-        setStatus(appStatus, "Appui trop court, recommence (3 s).");
-      };
-
-      // Pointer events (support iOS/Android)
-      button.addEventListener("pointerdown", (e) => { e.preventDefault(); startHold(); });
-      button.addEventListener("pointerup", (e) => { e.preventDefault(); cancelHold(); });
-      button.addEventListener("pointercancel", (e) => { e.preventDefault(); cancelHold(); });
-      button.addEventListener("pointerleave", (e) => { /* si doigt sort du bouton */ });
     }
-
-    /************** ACTIONS **************/
-    async function actionArrivee(){
-      if (isSendingArr) return;
-      isSendingArr = true;
-      btnArrivee.disabled = true;
-
-      try{
-        setStatus(appStatus, "GPS arrivée…");
-        const loc = await getCurrentLocation();
-
-        const v = selectedVeh(vehArr);
-        const payload = {
-          // identifiants
-          ouvrier_id: user.id,
-          ouvrier_nom: user.nom,
-          ouvrier_adresse: user.adresse || "",
-
-          // arrivée
-          date_jour: todayStr(),
-          heure_arrivee: timeStr(),
-          lat_arrivee: loc.lat,
-          lon_arrivee: loc.lon,
-
-          // véhicule arrivée
-          vehicule_arrivee_nom: v?.nom || "",
-          vehicule_arrivee_plaque: v?.plaque || "",
-
-          // compat ancien script (optionnel)
-          vehicule_nom: v?.nom || "",
-          vehicule_plaque: v?.plaque || ""
-        };
-
-        // On ne l’envoie pas tout de suite : on attend le départ (comme sur Android)
-        pointageDuJour = payload;
-        arriveeValidee = true;
-        saveArrivee();
-
-        setStatus(appStatus, `Arrivée validée ✔ (précision ~${Math.round(loc.acc||0)} m)\nVéhicule arrivée figé.`);
-        updateLockUI();
-
-      } catch(err){
-        btnArrivee.disabled = false;
-        setStatus(appStatus, "❌ " + err.message);
-      } finally{
-        isSendingArr = false;
-      }
-    }
-
-    async function actionDepart(){
-      if (isSendingDep) return;
-      isSendingDep = true;
-      btnDepart.disabled = true;
-
-      try{
-        if (!pointageDuJour){
-          // tentative de restauration
-          const aJson = safeJsonParse(localStorage.getItem(LS_ARRIVEE_JSON) || "");
-          if (aJson) pointageDuJour = aJson;
-        }
-        if (!pointageDuJour){
-          setStatus(appStatus, "Arrivée manquante. Revalide l'arrivée.");
-          arriveeValidee = false;
-          updateLockUI();
-          return;
-        }
-
-        setStatus(appStatus, "GPS départ…");
-        const loc = await getCurrentLocation();
-
-        // compléter payload
-        const v = selectedVeh(vehDep);
-        pointageDuJour.heure_depart = timeStr();
-        pointageDuJour.lat_depart = loc.lat;
-        pointageDuJour.lon_depart = loc.lon;
-        pointageDuJour.vehicule_depart_nom = v?.nom || "";
-        pointageDuJour.vehicule_depart_plaque = v?.plaque || "";
-
-        // sauvegarde au cas où
-        saveArrivee();
-
-        setStatus(appStatus, "Envoi vers serveur…");
-        const res = await apiPointageSave(pointageDuJour);
-
-        if (res.status === "duplicate" || res.code === "DUPLICATE_POINTAGE"){
-          setStatus(appStatus, "✅ Déjà envoyé aujourd'hui.");
-          localStorage.setItem(LS_LAST_SEND_DATE, todayStr());
-          alreadySentToday = true;
-          clearArrivee();
-          updateLockUI();
-          return;
-        }
-
-        if (res.status !== "ok"){
-          throw new Error(res.message || ("Erreur serveur : " + (res.code || "")));
-        }
-
-        setStatus(appStatus, "✅ Pointage envoyé ✔");
-        localStorage.setItem(LS_LAST_SEND_DATE, todayStr());
-        alreadySentToday = true;
-        clearArrivee();
-        updateLockUI();
-
-      } catch(err){
-        btnDepart.disabled = false;
-        setStatus(appStatus, "❌ " + err.message);
-      } finally{
-        isSendingDep = false;
-      }
-    }
-
-    /************** STARTUP **************/
-    (async function init(){
-      loadPersisted();
-      if (user){
-        showApp();
-        updateBadges();
-        setStatus(appStatus, alreadySentToday
-          ? "✅ Pointage déjà envoyé aujourd'hui."
-          : (arriveeValidee ? "Arrivée restaurée. Tu peux faire le départ." : "Prêt."));
-        updateLockUI();
-
-        // load vehicules
-        try{
-          setStatus(appStatus, "Chargement des véhicules...");
-          const v = await apiVehicules();
-          if (v.status === "ok"){
-            vehicules = v.data || [];
-            setVehOptions();
-
-            // reselection véhicule arrivée si restauré
-            if (arriveeValidee && pointageDuJour?.vehicule_arrivee_nom){
-              const name = pointageDuJour.vehicule_arrivee_nom;
-              const idx = vehicules.findIndex(x => (x.nom || "").toLowerCase() === String(name).toLowerCase());
-              if (idx >= 0) vehArr.selectedIndex = idx;
-              updatePlaques();
-            }
-
-            setStatus(appStatus, alreadySentToday
-              ? "✅ Pointage déjà envoyé aujourd'hui."
-              : (arriveeValidee ? "Arrivée restaurée. Tu peux faire le départ." : "Prêt."));
-          } else {
-            setStatus(appStatus, "❌ " + (v.message || "Erreur véhicules"));
-          }
-          updateLockUI();
-        } catch(err){
-          setStatus(appStatus, "❌ " + err.message);
-        }
-      } else {
-        showLogin();
-      }
-
-      setupHold(btnArrivee, "arr");
-      setupHold(btnDepart, "dep");
-    })();
-  </script>
+  })();
+</script>
 </body>
 </html>
