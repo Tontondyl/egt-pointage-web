@@ -2,406 +2,708 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EGT Wagner - Pointage</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#121212" />
+  <title>EGT – Pointage</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:#121212; color:#fff; margin:0; padding:16px;}
-    .card{max-width:520px; margin:0 auto; background:#1c1c1c; border-radius:14px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
-    h1{font-size:18px; margin:0 0 10px;}
-    label{display:block; font-size:13px; color:#bbb; margin:12px 0 6px;}
-    input,select,button{width:100%; box-sizing:border-box; padding:12px; border-radius:10px; border:1px solid #333; background:#101010; color:#fff; font-size:16px;}
-    button{border:0; cursor:pointer;}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-    .btnBlue{background:#1E88E5;}
-    .btnGreen{background:#43A047;}
-    .btnGray{background:#2b2b2b; color:#bbb;}
-    .status{margin-top:12px; color:#ddd; font-size:14px; min-height:20px;}
-    .small{font-size:12px;color:#aaa;margin-top:6px;}
-    .hidden{display:none;}
-    .divider{height:1px;background:#2a2a2a;margin:14px 0;}
+    :root{
+      --bg:#121212; --card:#1b1b1b; --muted:#bdbdbd; --text:#fff;
+      --blue:#1e88e5; --green:#43a047; --orange:#ff9800; --red:#e53935;
+      --border:#2a2a2a;
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      padding: 16px;
+    }
+    .wrap{max-width:520px;margin:0 auto;padding-bottom:32px}
+    .logo{display:flex;justify-content:center;margin-top:10px;margin-bottom:18px}
+    .logo img{width:170px;height:auto;object-fit:contain}
+    .card{
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow);
+    }
+    h1{font-size:18px;margin:0 0 12px 0}
+    label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+    input, select{
+      width:100%; padding:14px 12px; border-radius:12px;
+      border:1px solid var(--border); background:#0f0f0f; color:var(--text);
+      outline:none; font-size:16px;
+    }
+    .row{display:flex;gap:10px}
+    .row > *{flex:1}
+    .btn{
+      width:100%; padding:14px 12px; border:0; border-radius:12px;
+      font-size:16px; font-weight:700; color:#fff; cursor:pointer;
+      transition: transform .04s ease;
+    }
+    .btn:active{transform:scale(.99)}
+    .btn-blue{background:var(--blue)}
+    .btn-green{background:var(--green)}
+    .btn-gray{background:#2f2f2f;color:#fff}
+    .btn-red{background:var(--red)}
+    .muted{color:var(--muted);font-size:13px}
+    .status{
+      margin-top:14px; padding:12px; border-radius:12px;
+      background:#101010; border:1px solid var(--border);
+      color:#e0e0e0; white-space:pre-line;
+    }
+    .divider{height:1px;background:var(--border);margin:14px 0}
+    .pill{
+      display:inline-block; padding:6px 10px; border-radius:999px;
+      background:#101010; border:1px solid var(--border); color:var(--muted); font-size:12px;
+    }
+
+    /* HOLD PROGRESS */
+    .holdWrap{margin-top:10px}
+    .bar{
+      width:100%; height:8px; border-radius:999px; overflow:hidden;
+      background:#2a2a2a; border:1px solid #333;
+      display:none;
+    }
+    .bar > div{
+      width:0%; height:100%; background:var(--orange);
+      transition: width .04s linear;
+    }
+
+    /* Small helper */
+    .hint{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Pointage (iPhone/Web)</h1>
+  <div class="wrap">
+    <div class="logo">
+      <!-- Mets ton logo dans /egt_logo.png à la racine du repo (ou change le src) -->
+      <img src="egt_logo.png" alt="EGT" onerror="this.style.display='none'">
+    </div>
 
     <!-- LOGIN -->
-    <div id="loginBox">
-      <label>ID ouvrier</label>
-      <input id="inpId" placeholder="ex: 12" />
+    <div id="loginCard" class="card">
+      <h1>Connexion</h1>
+      <div class="muted">Connectez-vous avec votre identifiant ouvrier et mot de passe.</div>
 
-      <label>Mot de passe</label>
-      <input id="inpPwd" type="password" placeholder="••••••" />
+      <label for="loginId">ID ouvrier</label>
+      <input id="loginId" autocomplete="username" inputmode="text" placeholder="ex: 12" />
 
-      <button class="btnBlue" id="btnLogin">Se connecter</button>
-      <div class="status" id="statusLogin"></div>
-      <div class="small">Astuce iPhone : Safari → Partager → “Sur l’écran d’accueil”</div>
+      <label for="loginPass">Mot de passe</label>
+      <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
+
+      <div class="divider"></div>
+      <button id="btnLogin" class="btn btn-blue">Se connecter</button>
+
+      <div class="status" id="loginStatus">—</div>
+      <div class="hint">
+        Astuce iPhone : si la géolocalisation est refusée, allez dans
+        <b>Réglages → Safari → Localisation</b> (ou Réglages → Confidentialité → Service de localisation).
+      </div>
     </div>
 
     <!-- APP -->
-    <div id="appBox" class="hidden">
-      <div class="small" id="who"></div>
+    <div id="appCard" class="card hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div>
+          <div class="pill" id="pillUser">Ouvrier : -</div>
+          <div class="muted" id="pillAdr" style="margin-top:6px">Adresse : -</div>
+        </div>
+        <button id="btnLogout" class="btn btn-gray" style="width:auto;padding:10px 12px">Déconnexion</button>
+      </div>
+
       <div class="divider"></div>
+
+      <h1>Pointage</h1>
 
       <label>Véhicule arrivée</label>
       <select id="vehArr"></select>
-      <div class="small" id="plaqueArr">Plaque arrivée : -</div>
+      <div class="muted" id="plaqueArr" style="margin-top:6px">Plaque arrivée : -</div>
 
-      <label>Véhicule départ</label>
-      <select id="vehDep" disabled></select>
-      <div class="small" id="plaqueDep">Plaque départ : -</div>
+      <label style="margin-top:16px">Véhicule départ</label>
+      <select id="vehDep"></select>
+      <div class="muted" id="plaqueDep" style="margin-top:6px">Plaque départ : -</div>
 
       <div class="divider"></div>
 
       <div class="row">
-        <button class="btnBlue" id="btnArrivee">Arrivée (maintenir 3s)</button>
-        <button class="btnGreen" id="btnDepart">Départ (maintenir 3s)</button>
+        <button id="btnArrivee" class="btn btn-blue">Arrivée (maintenir)</button>
+        <button id="btnDepart" class="btn btn-green">Départ (maintenir)</button>
       </div>
 
-      <div class="status" id="statusApp"></div>
-      <div class="small" id="debug"></div>
+      <div class="holdWrap">
+        <div class="bar" id="holdBar"><div id="holdFill"></div></div>
+        <div class="hint" id="holdHint">Maintiens 3 secondes pour valider.</div>
+      </div>
+
+      <div class="status" id="appStatus">—</div>
     </div>
   </div>
 
-<script>
-  // =======================
-  // CONFIG : Mets ton URL /exec ici
-  // =======================
-  const API_URL = "https://script.google.com/macros/s/AKfycbyAGwr3dCcXbf9XcuaovU2mtRGtW8aQFHY88iL8hvCMmled1YmOoOivb2ITTr8toYBL/exec";
+  <script>
+    /************** CONFIG **************/
+    // Ton URL Apps Script (celle que tu as dans Android)
+    const API_URL = "https://script.google.com/macros/s/AKfycbyAGwr3dCcXbf9XcuaovU2mtRGtW8aQFHY88iL8hvCMmled1YmOoOivb2ITTr8toYBL/exec";
 
-  // =======================
-  // STATE
-  // =======================
-  let user = null;           // {id, nom, adresse}
-  let vehicules = [];        // {id, nom, plaque}
-  let pointage = null;       // JSON arrivée persisté localStorage
+    // HOLD
+    const HOLD_MS = 3000;
+    const TICK_MS = 33;
 
-  const LS_USER = "egt_user";
-  const LS_POINTAGE = "egt_pointage";
+    // Storage keys
+    const LS_USER = "egt_user";
+    const LS_ARRIVEE_JSON = "egt_arrivee_json";
+    const LS_ARRIVEE_VAL = "egt_arrivee_validee";
+    const LS_LAST_SEND_DATE = "egt_last_send_date";
 
-  // =======================
-  // JSONP helper
-  // =======================
-  function jsonp(url){
-    return new Promise((resolve,reject)=>{
-      const cb = "cb_" + Math.random().toString(36).slice(2);
-      window[cb] = (data)=>{
-        resolve(data);
-        cleanup();
-      };
-      const script = document.createElement("script");
-      script.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
-      script.onerror = ()=>{ reject(new Error("JSONP error")); cleanup(); };
+    /************** HELPERS **************/
+    const $ = (id) => document.getElementById(id);
 
-      function cleanup(){
-        delete window[cb];
-        if(script && script.parentNode) script.parentNode.removeChild(script);
+    function todayStr(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+    function timeStr(){
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mi = String(d.getMinutes()).padStart(2,'0');
+      return `${hh}:${mi}`;
+    }
+
+    function setStatus(el, msg){ el.textContent = msg || "—"; }
+
+    function safeJsonParse(s){
+      try{ return JSON.parse(s); } catch(e){ return null; }
+    }
+
+    // GET JSON via fetch
+    async function getJson(url){
+      const r = await fetch(url, { method:"GET", cache:"no-store" });
+      const txt = await r.text();
+      // Apps Script renvoie JSON
+      let obj = null;
+      try{ obj = JSON.parse(txt); } catch(e){
+        throw new Error("Réponse non JSON : " + txt.slice(0,200));
       }
-      document.body.appendChild(script);
-    });
-  }
-
-  function setStatus(el, msg){ el.textContent = msg || ""; }
-
-  function todayStr(){
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    return `${yyyy}-${mm}-${dd}`;
-  }
-  function timeStr(){
-    const d = new Date();
-    const hh = String(d.getHours()).padStart(2,"0");
-    const mi = String(d.getMinutes()).padStart(2,"0");
-    return `${hh}:${mi}`;
-  }
-
-  // =======================
-  // UI refs
-  // =======================
-  const loginBox = document.getElementById("loginBox");
-  const appBox = document.getElementById("appBox");
-  const statusLogin = document.getElementById("statusLogin");
-  const statusApp = document.getElementById("statusApp");
-  const who = document.getElementById("who");
-
-  const inpId = document.getElementById("inpId");
-  const inpPwd = document.getElementById("inpPwd");
-  const btnLogin = document.getElementById("btnLogin");
-
-  const vehArr = document.getElementById("vehArr");
-  const vehDep = document.getElementById("vehDep");
-  const plaqueArr = document.getElementById("plaqueArr");
-  const plaqueDep = document.getElementById("plaqueDep");
-
-  const btnArrivee = document.getElementById("btnArrivee");
-  const btnDepart  = document.getElementById("btnDepart");
-
-  // =======================
-  // Restore
-  // =======================
-  function restore(){
-    try{
-      const u = localStorage.getItem(LS_USER);
-      if(u) user = JSON.parse(u);
-      const p = localStorage.getItem(LS_POINTAGE);
-      if(p) pointage = JSON.parse(p);
-    }catch(e){}
-  }
-
-  function showApp(){
-    loginBox.classList.add("hidden");
-    appBox.classList.remove("hidden");
-    who.textContent = `Connecté : ${user.nom} (ID ${user.id})`;
-  }
-
-  function showLogin(){
-    loginBox.classList.remove("hidden");
-    appBox.classList.add("hidden");
-  }
-
-  // =======================
-  // Vehicles
-  // =======================
-  async function loadVehicules(){
-    setStatus(statusApp, "Chargement des véhicules...");
-    const url = `${API_URL}?type=vehicule`;
-    const res = await jsonp(url);
-    if(res.status !== "ok") throw new Error(res.message || "Erreur véhicules");
-
-    vehicules = res.data || [];
-    vehArr.innerHTML = "";
-    vehDep.innerHTML = "";
-
-    for(const v of vehicules){
-      const o1 = document.createElement("option");
-      o1.value = v.id; o1.textContent = v.nom;
-      vehArr.appendChild(o1);
-
-      const o2 = document.createElement("option");
-      o2.value = v.id; o2.textContent = v.nom;
-      vehDep.appendChild(o2);
+      if (!r.ok) throw new Error("HTTP " + r.status + " : " + txt);
+      return obj;
     }
 
-    // default select
-    if(vehicules.length){
-      vehArr.value = vehicules[0].id;
-      vehDep.value = vehicules[0].id;
-      updatePlaques();
+    // POST JSON via fetch (Android-like)
+    async function postJson(url, payload){
+      const r = await fetch(url, {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      const txt = await r.text();
+      let obj = null;
+      try{ obj = JSON.parse(txt); } catch(e){
+        throw new Error("Réponse non JSON : " + txt.slice(0,200));
+      }
+      if (!r.ok) throw new Error("HTTP " + r.status + " : " + txt);
+      return obj;
     }
 
-    // si arrivée déjà enregistrée => figer arrivée et activer départ
-    if(pointage && pointage.arriveeValidee){
-      vehArr.disabled = true;
-      btnArrivee.disabled = true;
-      vehDep.disabled = false;
-      setStatus(statusApp, "Arrivée restaurée (tu peux faire le départ).");
-    }else{
-      vehArr.disabled = false;
-      btnArrivee.disabled = false;
-      vehDep.disabled = true;
-    }
-  }
-
-  function findVehById(id){
-    return vehicules.find(v=>String(v.id)===String(id));
-  }
-
-  function updatePlaques(){
-    const vA = findVehById(vehArr.value);
-    const vD = findVehById(vehDep.value);
-    plaqueArr.textContent = "Plaque arrivée : " + (vA ? vA.plaque : "-");
-    plaqueDep.textContent = "Plaque départ : " + (vD ? vD.plaque : "-");
-  }
-
-  vehArr.addEventListener("change", updatePlaques);
-  vehDep.addEventListener("change", updatePlaques);
-
-  // =======================
-  // Geolocation
-  // =======================
-  function getLocation(){
-    return new Promise((resolve,reject)=>{
-      if(!navigator.geolocation) return reject(new Error("GPS indisponible"));
-      navigator.geolocation.getCurrentPosition(
-        pos => resolve({lat: pos.coords.latitude, lon: pos.coords.longitude}),
-        err => reject(new Error("GPS refusé / indisponible")),
-        { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
-      );
-    });
-  }
-
-  // =======================
-  // Pointage submit (JSONP)
-  // =======================
-  async function submitPointage(data){
-    const payload = encodeURIComponent(JSON.stringify(data));
-    const url = `${API_URL}?type=pointage_web&payload=${payload}`;
-    return await jsonp(url);
-  }
-
-  // =======================
-  // Hold 3s helper
-  // =======================
-  function hold3s(button, action){
-    let timer = null;
-    let holding = false;
-
-    const start = ()=>{
-      if(holding) return;
-      holding = true;
-      setStatus(statusApp, "Maintiens 3 secondes...");
-      timer = setTimeout(async ()=>{
-        timer = null;
-        try{
-          await action();
-        }catch(e){
-          setStatus(statusApp, "Erreur : " + e.message);
-        }finally{
-          holding = false;
+    function getCurrentLocation(){
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("Géolocalisation non supportée."));
+          return;
         }
-      }, 3000);
-    };
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            acc: pos.coords.accuracy
+          }),
+          (err) => reject(new Error("Géoloc refusée/indispo : " + (err.message || err.code))),
+          { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+        );
+      });
+    }
 
-    const cancel = ()=>{
-      if(timer){
-        clearTimeout(timer);
-        timer = null;
-        setStatus(statusApp, "Appui trop court, recommence (3 s).");
+    /************** STATE **************/
+    let user = null; // {id, nom, adresse}
+    let vehicules = []; // {id, nom, plaque}
+    let arriveeValidee = false;
+    let pointageDuJour = null; // objet JSON (arrivée)
+
+    let alreadySentToday = false;
+
+    let isSendingArr = false;
+    let isSendingDep = false;
+
+    /************** UI INIT **************/
+    const loginCard = $("loginCard");
+    const appCard = $("appCard");
+    const loginStatus = $("loginStatus");
+    const appStatus = $("appStatus");
+
+    const vehArr = $("vehArr");
+    const vehDep = $("vehDep");
+    const plaqueArr = $("plaqueArr");
+    const plaqueDep = $("plaqueDep");
+
+    const btnLogin = $("btnLogin");
+    const btnLogout = $("btnLogout");
+    const btnArrivee = $("btnArrivee");
+    const btnDepart = $("btnDepart");
+
+    const holdBar = $("holdBar");
+    const holdFill = $("holdFill");
+    const holdHint = $("holdHint");
+
+    function showLogin(){
+      loginCard.classList.remove("hidden");
+      appCard.classList.add("hidden");
+    }
+    function showApp(){
+      loginCard.classList.add("hidden");
+      appCard.classList.remove("hidden");
+    }
+
+    function updateBadges(){
+      $("pillUser").textContent = `Ouvrier : ${user?.nom || "-"}`;
+      $("pillAdr").textContent = `Adresse : ${user?.adresse || "-"}`;
+    }
+
+    function setVehOptions(){
+      vehArr.innerHTML = "";
+      vehDep.innerHTML = "";
+      vehicules.forEach(v => {
+        const o1 = document.createElement("option");
+        o1.value = v.id || v.nom;
+        o1.textContent = v.nom;
+        o1.dataset.plaque = v.plaque || "";
+        o1.dataset.nom = v.nom || "";
+        vehArr.appendChild(o1);
+
+        const o2 = document.createElement("option");
+        o2.value = v.id || v.nom;
+        o2.textContent = v.nom;
+        o2.dataset.plaque = v.plaque || "";
+        o2.dataset.nom = v.nom || "";
+        vehDep.appendChild(o2);
+      });
+
+      // defaults
+      if (vehicules.length){
+        vehArr.selectedIndex = 0;
+        vehDep.selectedIndex = 0;
+        updatePlaques();
+      } else {
+        plaqueArr.textContent = "Plaque arrivée : -";
+        plaqueDep.textContent = "Plaque départ : -";
       }
-      holding = false;
-    };
-
-    button.addEventListener("touchstart", start, {passive:true});
-    button.addEventListener("touchend", cancel);
-    button.addEventListener("touchcancel", cancel);
-
-    // aussi souris (PC)
-    button.addEventListener("mousedown", start);
-    button.addEventListener("mouseup", cancel);
-    button.addEventListener("mouseleave", cancel);
-  }
-
-  // =======================
-  // Actions
-  // =======================
-  async function doArrivee(){
-    if(pointage && pointage.arriveeValidee){
-      setStatus(statusApp, "Arrivée déjà validée.");
-      return;
     }
 
-    setStatus(statusApp, "GPS arrivée...");
-    const gps = await getLocation();
-
-    const vA = findVehById(vehArr.value);
-    const data = {
-      ouvrier_id: user.id,
-      ouvrier_nom: user.nom,
-      ouvrier_adresse: user.adresse || "",
-      date_jour: todayStr(),
-      heure_arrivee: timeStr(),
-      lat_arrivee: gps.lat,
-      lon_arrivee: gps.lon,
-      vehicule_arrivee_nom: vA ? vA.nom : "",
-      vehicule_arrivee_plaque: vA ? vA.plaque : ""
-    };
-
-    // On ne l’envoie PAS tout de suite si tu veux garder la logique Android (envoi au départ)
-    // Ici, on garde pareil : on stocke seulement l’arrivée.
-    pointage = { arriveeValidee:true, data };
-    localStorage.setItem(LS_POINTAGE, JSON.stringify(pointage));
-
-    vehArr.disabled = true;
-    btnArrivee.disabled = true;
-    vehDep.disabled = false;
-
-    setStatus(statusApp, "Arrivée validée ✔ (véhicule arrivée figé)");
-  }
-
-  async function doDepart(){
-    if(!pointage || !pointage.arriveeValidee){
-      setStatus(statusApp, "Commence par valider l'arrivée.");
-      return;
+    function selectedVeh(selectEl){
+      const opt = selectEl.options[selectEl.selectedIndex];
+      if (!opt) return null;
+      return {
+        nom: opt.dataset.nom || opt.textContent || "",
+        plaque: opt.dataset.plaque || ""
+      };
     }
 
-    setStatus(statusApp, "GPS départ...");
-    const gps = await getLocation();
-
-    const vD = findVehById(vehDep.value);
-
-    // compléter et envoyer
-    const data = Object.assign({}, pointage.data, {
-      heure_depart: timeStr(),
-      lat_depart: gps.lat,
-      lon_depart: gps.lon,
-      vehicule_depart_nom: vD ? vD.nom : "",
-      vehicule_depart_plaque: vD ? vD.plaque : ""
-    });
-
-    setStatus(statusApp, "Envoi...");
-    const res = await submitPointage(data);
-
-    if(res.status === "duplicate" || res.code === "DUPLICATE_POINTAGE"){
-      setStatus(statusApp, "Déjà envoyé aujourd'hui ✔");
-    }else if(res.status !== "ok"){
-      throw new Error(res.message || "Erreur serveur");
-    }else{
-      setStatus(statusApp, "Pointage envoyé ✔");
+    function updatePlaques(){
+      const a = selectedVeh(vehArr);
+      const d = selectedVeh(vehDep);
+      plaqueArr.textContent = "Plaque arrivée : " + (a?.plaque || "-");
+      plaqueDep.textContent = "Plaque départ : " + (d?.plaque || "-");
     }
 
-    // reset journée côté web
-    pointage = null;
-    localStorage.removeItem(LS_POINTAGE);
+    vehArr.addEventListener("change", updatePlaques);
+    vehDep.addEventListener("change", updatePlaques);
 
-    vehArr.disabled = false;
-    btnArrivee.disabled = false;
-    vehDep.disabled = true;
+    function clearHoldUI(){
+      holdBar.style.display = "none";
+      holdFill.style.width = "0%";
+    }
 
-    // Option: tu peux aussi déconnecter automatiquement
-  }
-
-  // =======================
-  // Login
-  // =======================
-  btnLogin.addEventListener("click", async ()=>{
-    try{
-      setStatus(statusLogin, "Connexion...");
-      const id = inpId.value.trim();
-      const pwd = inpPwd.value.trim();
-      if(!id || !pwd){ setStatus(statusLogin, "ID et mot de passe requis."); return; }
-
-      const url = `${API_URL}?type=login&id=${encodeURIComponent(id)}&password=${encodeURIComponent(pwd)}`;
-      const res = await jsonp(url);
-
-      if(res.status !== "ok"){
-        setStatus(statusLogin, res.message || "Erreur login");
+    function updateLockUI(){
+      // déjà envoyé aujourd'hui -> tout bloqué
+      if (alreadySentToday){
+        btnArrivee.disabled = true;
+        btnDepart.disabled = true;
+        vehArr.disabled = true;
+        vehDep.disabled = true;
+        holdHint.textContent = "Pointage déjà envoyé aujourd'hui.";
         return;
       }
 
-      user = res.data;
-      localStorage.setItem(LS_USER, JSON.stringify(user));
-      showApp();
-      await loadVehicules();
+      if (!arriveeValidee){
+        btnArrivee.disabled = false;
+        btnDepart.disabled = false; // on laisse, mais on affichera le message
+        vehArr.disabled = false;
+        vehDep.disabled = true;
+        holdHint.textContent = "Maintiens 3 secondes pour valider.";
+        return;
+      }
 
-    }catch(e){
-      setStatus(statusLogin, "Erreur : " + e.message);
+      // arrivée faite -> figer vehArr
+      btnArrivee.disabled = true;
+      vehArr.disabled = true;
+
+      btnDepart.disabled = false;
+      vehDep.disabled = false;
+      holdHint.textContent = "Maintiens 3 secondes pour valider le départ.";
     }
-  });
 
-  // setup holds
-  hold3s(btnArrivee, doArrivee);
-  hold3s(btnDepart, doDepart);
+    /************** PERSISTENCE **************/
+    function loadPersisted(){
+      // already sent
+      const last = localStorage.getItem(LS_LAST_SEND_DATE) || "";
+      if (last === todayStr()){
+        alreadySentToday = true;
+        localStorage.removeItem(LS_ARRIVEE_JSON);
+        localStorage.removeItem(LS_ARRIVEE_VAL);
+      }
 
-  // boot
-  restore();
-  if(user){
-    showApp();
-    loadVehicules().catch(e=>setStatus(statusApp, "Erreur : "+e.message));
-  }else{
-    showLogin();
-  }
-</script>
+      // user
+      const u = safeJsonParse(localStorage.getItem(LS_USER) || "");
+      if (u && u.id && u.nom){
+        user = u;
+      }
+
+      // arrivée
+      const aVal = localStorage.getItem(LS_ARRIVEE_VAL) === "1";
+      const aJson = safeJsonParse(localStorage.getItem(LS_ARRIVEE_JSON) || "");
+      if (aVal && aJson){
+        arriveeValidee = true;
+        pointageDuJour = aJson;
+      }
+    }
+
+    function saveArrivee(){
+      localStorage.setItem(LS_ARRIVEE_VAL, arriveeValidee ? "1" : "0");
+      localStorage.setItem(LS_ARRIVEE_JSON, pointageDuJour ? JSON.stringify(pointageDuJour) : "");
+    }
+
+    function clearArrivee(){
+      arriveeValidee = false;
+      pointageDuJour = null;
+      localStorage.removeItem(LS_ARRIVEE_VAL);
+      localStorage.removeItem(LS_ARRIVEE_JSON);
+    }
+
+    /************** API CALLS **************/
+    async function apiLogin(id, password){
+      const url = new URL(API_URL);
+      url.searchParams.set("type", "login");
+      url.searchParams.set("id", id);
+      url.searchParams.set("password", password);
+      return await getJson(url.toString());
+    }
+
+    async function apiVehicules(){
+      const url = new URL(API_URL);
+      url.searchParams.set("type", "vehicule");
+      return await getJson(url.toString());
+    }
+
+    async function apiPointageSave(payload){
+      // Web peut faire POST aussi (plus simple)
+      return await postJson(API_URL, payload);
+      // (Alternative GET pointage_web + payload=... si tu veux absolument éviter POST)
+    }
+
+    /************** LOGIN FLOW **************/
+    btnLogin.addEventListener("click", async () => {
+      const id = $("loginId").value.trim();
+      const pass = $("loginPass").value.trim();
+
+      if (!id || !pass){
+        setStatus(loginStatus, "⚠️ Entre ID + mot de passe.");
+        return;
+      }
+
+      btnLogin.disabled = true;
+      setStatus(loginStatus, "Connexion...");
+      try{
+        const res = await apiLogin(id, pass);
+        if (res.status !== "ok"){
+          setStatus(loginStatus, "❌ " + (res.message || "Connexion impossible"));
+          btnLogin.disabled = false;
+          return;
+        }
+
+        user = res.data;
+        localStorage.setItem(LS_USER, JSON.stringify(user));
+
+        setStatus(loginStatus, "✅ Connecté.");
+        showApp();
+        updateBadges();
+
+        // load vehicles
+        setStatus(appStatus, "Chargement des véhicules...");
+        const v = await apiVehicules();
+        if (v.status !== "ok"){
+          setStatus(appStatus, "❌ " + (v.message || "Erreur véhicules"));
+        } else {
+          vehicules = v.data || [];
+          setVehOptions();
+          // si arrivée restaurée : reselection véhicule arrivée
+          if (arriveeValidee && pointageDuJour?.vehicule_arrivee_nom){
+            const name = pointageDuJour.vehicule_arrivee_nom;
+            const idx = vehicules.findIndex(x => (x.nom || "").toLowerCase() === String(name).toLowerCase());
+            if (idx >= 0) vehArr.selectedIndex = idx;
+            updatePlaques();
+          }
+          setStatus(appStatus, alreadySentToday
+            ? "✅ Pointage déjà envoyé aujourd'hui."
+            : (arriveeValidee ? "Arrivée restaurée. Tu peux faire le départ." : "Prêt."));
+        }
+
+        updateLockUI();
+
+      } catch(err){
+        setStatus(loginStatus, "❌ " + err.message);
+      } finally{
+        btnLogin.disabled = false;
+      }
+    });
+
+    btnLogout.addEventListener("click", () => {
+      user = null;
+      vehicules = [];
+      clearArrivee();
+      localStorage.removeItem(LS_USER);
+      setStatus(appStatus, "—");
+      setStatus(loginStatus, "—");
+      showLogin();
+    });
+
+    /************** HOLD HANDLER **************/
+    function setupHold(button, kind){ // kind: "arr" or "dep"
+      let timer = null;
+      let tick = null;
+      let start = 0;
+      let triggered = false;
+
+      const startHold = async () => {
+        if (alreadySentToday){
+          setStatus(appStatus, "✅ Pointage déjà envoyé aujourd'hui.");
+          return;
+        }
+
+        if (kind === "arr" && arriveeValidee){
+          setStatus(appStatus, "Arrivée déjà validée.");
+          return;
+        }
+        if (kind === "dep" && !arriveeValidee){
+          setStatus(appStatus, "Commence par valider l'arrivée.");
+          return;
+        }
+
+        if (kind === "arr" && isSendingArr) return;
+        if (kind === "dep" && isSendingDep) return;
+
+        triggered = false;
+        start = Date.now();
+        holdBar.style.display = "block";
+        holdFill.style.width = "0%";
+
+        setStatus(appStatus, (kind === "arr")
+          ? "Maintiens 3 secondes pour valider l'arrivée…"
+          : "Maintiens 3 secondes pour valider le départ…");
+
+        tick = setInterval(() => {
+          const elapsed = Date.now() - start;
+          const p = Math.min(1, elapsed / HOLD_MS);
+          holdFill.style.width = (p * 100).toFixed(1) + "%";
+        }, TICK_MS);
+
+        timer = setTimeout(async () => {
+          triggered = true;
+          clearInterval(tick); tick = null;
+          clearTimeout(timer); timer = null;
+          holdFill.style.width = "100%";
+          setTimeout(clearHoldUI, 120);
+
+          if (kind === "arr") await actionArrivee();
+          else await actionDepart();
+
+        }, HOLD_MS);
+      };
+
+      const cancelHold = () => {
+        if (triggered) return; // action already launched
+        if (timer){ clearTimeout(timer); timer = null; }
+        if (tick){ clearInterval(tick); tick = null; }
+        clearHoldUI();
+        setStatus(appStatus, "Appui trop court, recommence (3 s).");
+      };
+
+      // Pointer events (support iOS/Android)
+      button.addEventListener("pointerdown", (e) => { e.preventDefault(); startHold(); });
+      button.addEventListener("pointerup", (e) => { e.preventDefault(); cancelHold(); });
+      button.addEventListener("pointercancel", (e) => { e.preventDefault(); cancelHold(); });
+      button.addEventListener("pointerleave", (e) => { /* si doigt sort du bouton */ });
+    }
+
+    /************** ACTIONS **************/
+    async function actionArrivee(){
+      if (isSendingArr) return;
+      isSendingArr = true;
+      btnArrivee.disabled = true;
+
+      try{
+        setStatus(appStatus, "GPS arrivée…");
+        const loc = await getCurrentLocation();
+
+        const v = selectedVeh(vehArr);
+        const payload = {
+          // identifiants
+          ouvrier_id: user.id,
+          ouvrier_nom: user.nom,
+          ouvrier_adresse: user.adresse || "",
+
+          // arrivée
+          date_jour: todayStr(),
+          heure_arrivee: timeStr(),
+          lat_arrivee: loc.lat,
+          lon_arrivee: loc.lon,
+
+          // véhicule arrivée
+          vehicule_arrivee_nom: v?.nom || "",
+          vehicule_arrivee_plaque: v?.plaque || "",
+
+          // compat ancien script (optionnel)
+          vehicule_nom: v?.nom || "",
+          vehicule_plaque: v?.plaque || ""
+        };
+
+        // On ne l’envoie pas tout de suite : on attend le départ (comme sur Android)
+        pointageDuJour = payload;
+        arriveeValidee = true;
+        saveArrivee();
+
+        setStatus(appStatus, `Arrivée validée ✔ (précision ~${Math.round(loc.acc||0)} m)\nVéhicule arrivée figé.`);
+        updateLockUI();
+
+      } catch(err){
+        btnArrivee.disabled = false;
+        setStatus(appStatus, "❌ " + err.message);
+      } finally{
+        isSendingArr = false;
+      }
+    }
+
+    async function actionDepart(){
+      if (isSendingDep) return;
+      isSendingDep = true;
+      btnDepart.disabled = true;
+
+      try{
+        if (!pointageDuJour){
+          // tentative de restauration
+          const aJson = safeJsonParse(localStorage.getItem(LS_ARRIVEE_JSON) || "");
+          if (aJson) pointageDuJour = aJson;
+        }
+        if (!pointageDuJour){
+          setStatus(appStatus, "Arrivée manquante. Revalide l'arrivée.");
+          arriveeValidee = false;
+          updateLockUI();
+          return;
+        }
+
+        setStatus(appStatus, "GPS départ…");
+        const loc = await getCurrentLocation();
+
+        // compléter payload
+        const v = selectedVeh(vehDep);
+        pointageDuJour.heure_depart = timeStr();
+        pointageDuJour.lat_depart = loc.lat;
+        pointageDuJour.lon_depart = loc.lon;
+        pointageDuJour.vehicule_depart_nom = v?.nom || "";
+        pointageDuJour.vehicule_depart_plaque = v?.plaque || "";
+
+        // sauvegarde au cas où
+        saveArrivee();
+
+        setStatus(appStatus, "Envoi vers serveur…");
+        const res = await apiPointageSave(pointageDuJour);
+
+        if (res.status === "duplicate" || res.code === "DUPLICATE_POINTAGE"){
+          setStatus(appStatus, "✅ Déjà envoyé aujourd'hui.");
+          localStorage.setItem(LS_LAST_SEND_DATE, todayStr());
+          alreadySentToday = true;
+          clearArrivee();
+          updateLockUI();
+          return;
+        }
+
+        if (res.status !== "ok"){
+          throw new Error(res.message || ("Erreur serveur : " + (res.code || "")));
+        }
+
+        setStatus(appStatus, "✅ Pointage envoyé ✔");
+        localStorage.setItem(LS_LAST_SEND_DATE, todayStr());
+        alreadySentToday = true;
+        clearArrivee();
+        updateLockUI();
+
+      } catch(err){
+        btnDepart.disabled = false;
+        setStatus(appStatus, "❌ " + err.message);
+      } finally{
+        isSendingDep = false;
+      }
+    }
+
+    /************** STARTUP **************/
+    (async function init(){
+      loadPersisted();
+      if (user){
+        showApp();
+        updateBadges();
+        setStatus(appStatus, alreadySentToday
+          ? "✅ Pointage déjà envoyé aujourd'hui."
+          : (arriveeValidee ? "Arrivée restaurée. Tu peux faire le départ." : "Prêt."));
+        updateLockUI();
+
+        // load vehicules
+        try{
+          setStatus(appStatus, "Chargement des véhicules...");
+          const v = await apiVehicules();
+          if (v.status === "ok"){
+            vehicules = v.data || [];
+            setVehOptions();
+
+            // reselection véhicule arrivée si restauré
+            if (arriveeValidee && pointageDuJour?.vehicule_arrivee_nom){
+              const name = pointageDuJour.vehicule_arrivee_nom;
+              const idx = vehicules.findIndex(x => (x.nom || "").toLowerCase() === String(name).toLowerCase());
+              if (idx >= 0) vehArr.selectedIndex = idx;
+              updatePlaques();
+            }
+
+            setStatus(appStatus, alreadySentToday
+              ? "✅ Pointage déjà envoyé aujourd'hui."
+              : (arriveeValidee ? "Arrivée restaurée. Tu peux faire le départ." : "Prêt."));
+          } else {
+            setStatus(appStatus, "❌ " + (v.message || "Erreur véhicules"));
+          }
+          updateLockUI();
+        } catch(err){
+          setStatus(appStatus, "❌ " + err.message);
+        }
+      } else {
+        showLogin();
+      }
+
+      setupHold(btnArrivee, "arr");
+      setupHold(btnDepart, "dep");
+    })();
+  </script>
 </body>
 </html>
