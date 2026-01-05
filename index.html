@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>EGT – Pointage</title>
+  <link rel="icon" href="logo%20egt.png">
+<link rel="apple-touch-icon" href="logo%20egt.png">
+<meta name="theme-color" content="#0b0b0d">  
   <style>
     :root{
       --bg:#0b0b0d;
@@ -50,13 +53,12 @@
       border-bottom:1px solid var(--line);
       background:rgba(0,0,0,.18);
     }
-    .logo{
-      width:34px; height:34px;
-      border-radius:10px;
-      background: linear-gradient(135deg, rgba(31,134,255,.95), rgba(46,204,113,.85));
-      box-shadow: 0 10px 30px rgba(31,134,255,.22);
-      display:grid; place-items:center;
-      font-weight:800;
+    .logo-img{
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;      /* effet squircle */
+    object-fit: cover;
+    box-shadow: 0 6px 14px rgba(0,0,0,.35);
     }
     h1{ margin:0; font-size:16px; letter-spacing:.2px; }
     .sub{ margin:0; color:var(--muted); font-size:12px; }
@@ -161,7 +163,7 @@
 <div class="wrap">
   <div class="card">
     <div class="top">
-      <div class="logo">EGT</div>
+      <img src="logo%20egt.png" class="logo-img" alt="EGT Wagner">
       <div>
         <h1>EGT – Pointage</h1>
         <p class="sub">Web (iPhone / Android) – Arrivée + Départ</p>
@@ -251,11 +253,6 @@
             <div id="statusText">Prêt.</div>
             <small id="statusSmall">Sélectionne les véhicules puis valide l’arrivée.</small>
           </div>
-        </div>
-
-        <div class="hint">
-          La ligne est envoyée au serveur <b>uniquement au départ</b> (arrivée stockée localement entre-temps).
-          <br/>Si le serveur répond <b>DUPLICATE_POINTAGE</b>, la journée est verrouillée (“déjà envoyé”).
         </div>
       </div>
     </div>
