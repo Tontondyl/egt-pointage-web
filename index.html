@@ -4,9 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>EGT – Pointage</title>
-  <link rel="icon" href="logoegt.png">
-<link rel="apple-touch-icon" href="logoegt.png">
-<meta name="theme-color" content="#0b0b0d">  
+
+  <!-- ✅ PWA (Android/Samsung) -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b0b0d">
+
+  <!-- ✅ Android/Chrome/Samsung (favicon + fallback) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+  <link rel="icon" type="image/png" href="./icon-512.png">
+
+  <!-- ✅ iPhone/iPad (écran d’accueil) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <style>
     :root{
       --bg:#0b0b0d;
@@ -54,11 +66,11 @@
       background:rgba(0,0,0,.18);
     }
     .logo-img{
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;      /* effet squircle */
-    object-fit: cover;
-    box-shadow: 0 6px 14px rgba(0,0,0,.35);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 6px 14px rgba(0,0,0,.35);
     }
     h1{ margin:0; font-size:16px; letter-spacing:.2px; }
     .sub{ margin:0; color:var(--muted); font-size:12px; }
@@ -163,7 +175,8 @@
 <div class="wrap">
   <div class="card">
     <div class="top">
-      <img src="logoegt.png" class="logo-img" alt="EGT Wagner">
+      <!-- ✅ dans l'UI on pointe vers l'icône -->
+      <img src="./icon-512.png" class="logo-img" alt="EGT Wagner">
       <div>
         <h1>EGT – Pointage</h1>
         <p class="sub">Web (iPhone / Android) – Arrivée + Départ</p>
@@ -260,20 +273,13 @@
 </div>
 
 <script>
-  // =====================================================
-  // CONFIG
-  // =====================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbyAGwr3dCcXbf9XcuaovU2mtRGtW8aQFHY88iL8hvCMmled1YmOoOivb2ITTr8toYBL/exec";
   const HOLD_MS = 3000;
 
-  // Storage keys
-  const LS_USER = "egt_user_v1";             // {id, nom, adresse}
-  const LS_ARR  = "egt_arrivee_v1";          // arrival payload stored until depart
-  const LS_SENT = "egt_sent_v1";             // { "<id>|<yyyy-mm-dd>": true }
+  const LS_USER = "egt_user_v1";
+  const LS_ARR  = "egt_arrivee_v1";
+  const LS_SENT = "egt_sent_v1";
 
-  // =====================================================
-  // DOM
-  // =====================================================
   const viewLogin = document.getElementById("viewLogin");
   const viewPointage = document.getElementById("viewPointage");
 
@@ -303,17 +309,13 @@
   const progressWrap = document.getElementById("progressWrap");
   const progressBar = document.getElementById("progressBar");
 
-  // In-memory state
   let currentUser = null;
-  let vehicules = []; // [{id, nom, plaque, ...}]
+  let vehicules = [];
   let holdingTimer = null;
   let holdingStart = 0;
-  let holdingWhich = null; // "arr" or "dep"
+  let holdingWhich = null;
   let isSending = false;
 
-  // =====================================================
-  // Helpers
-  // =====================================================
   function todayISO(){
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -354,13 +356,11 @@
     localStorage.removeItem(key);
   }
 
-  // JSONP GET (bypass CORS for GitHub Pages)
   function jsonp(params){
     return new Promise((resolve, reject) => {
       const cb = "cb_" + Math.random().toString(36).slice(2);
       const url = new URL(API_URL);
       Object.entries(params || {}).forEach(([k,v]) => url.searchParams.set(k, v));
-
       url.searchParams.set("callback", cb);
 
       const script = document.createElement("script");
@@ -426,7 +426,6 @@
   }
 
   function lockUI(){
-    // if already sent today -> disable everything
     const sent = isDaySent();
     const arrSaved = lsGet(LS_ARR);
 
@@ -440,7 +439,6 @@
     }
 
     if(arrSaved){
-      // arrival done locally
       vehArr.disabled = true;
       btnArrivee.disabled = true;
 
@@ -453,14 +451,11 @@
       btnArrivee.disabled = false;
 
       vehDep.disabled = true;
-      btnDepart.disabled = false; // bouton gère message
+      btnDepart.disabled = false;
       setStatus("", "Prêt.", "Sélectionne les véhicules puis valide l’arrivée.");
     }
   }
 
-  // =====================================================
-  // GEOLOCATION
-  // =====================================================
   function getLocation(){
     return new Promise((resolve, reject) => {
       if(!navigator.geolocation){
@@ -483,28 +478,16 @@
     });
   }
 
-  // =====================================================
-  // API calls
-  // =====================================================
-  async function apiLogin(id, password){
-    return await jsonp({ type:"login", id, password });
-  }
-  async function apiVehicules(){
-    return await jsonp({ type:"vehicule" });
-  }
+  async function apiLogin(id, password){ return await jsonp({ type:"login", id, password }); }
+  async function apiVehicules(){ return await jsonp({ type:"vehicule" }); }
   async function apiSendPointage(payloadObj){
-    // server expects GET type=pointage_web&payload=<encoded json>
     const payload = encodeURIComponent(JSON.stringify(payloadObj));
     return await jsonp({ type:"pointage_web", payload });
   }
 
-  // =====================================================
-  // HOLD BUTTON (3 seconds)
-  // =====================================================
   function startHold(which){
     if(isSending) return;
 
-    // guard
     if(which === "dep"){
       const arr = lsGet(LS_ARR);
       if(!arr){
@@ -532,7 +515,6 @@
     progressWrap.style.display = "block";
     progressBar.style.width = "0%";
 
-    // tick animation
     const tick = () => {
       const elapsed = Date.now() - holdingStart;
       const pct = Math.min(100, (elapsed / HOLD_MS) * 100);
@@ -575,16 +557,12 @@
     const down = (e) => { e.preventDefault(); startHold(which); };
     const up   = (e) => { e.preventDefault(); if(holdingWhich){ setStatus("warn","Appui trop court.", "Maintiens 3 secondes."); } cancelHold(); };
 
-    // pointer events (works on iOS/Android/desktop)
     btn.addEventListener("pointerdown", down);
     btn.addEventListener("pointerup", up);
     btn.addEventListener("pointercancel", up);
     btn.addEventListener("pointerleave", up);
   }
 
-  // =====================================================
-  // ARRIVEE / DEPART logic
-  // =====================================================
   async function doArrivee(){
     if(isSending) return;
     isSending = true;
@@ -609,7 +587,6 @@
         lon_arrivee: loc.lon,
         vehicule_arrivee_nom: vA.nom || "",
         vehicule_arrivee_plaque: vA.plaque || "",
-        // compat
         vehicule_nom: vA.nom || "",
         vehicule_plaque: vA.plaque || ""
       };
@@ -659,13 +636,11 @@
 
       const res = await apiSendPointage(payload);
 
-      // res: {status, code, message, data}
       const st = (res && (res.status || "")).toLowerCase();
       const code = (res && (res.code || "")).toUpperCase();
       const msg = (res && (res.message || "")) || "";
 
       if(st === "duplicate" || code === "DUPLICATE_POINTAGE"){
-        // serveur dit déjà enregistré
         markDaySent();
         lsDel(LS_ARR);
         setStatus("ok", "Déjà envoyé aujourd’hui ✔", "Journée verrouillée.");
@@ -678,7 +653,6 @@
         return;
       }
 
-      // OK
       markDaySent();
       lsDel(LS_ARR);
       setStatus("ok", "Pointage envoyé ✔", "Merci.");
@@ -691,14 +665,10 @@
     }
   }
 
-  // =====================================================
-  // UI flow
-  // =====================================================
   async function initAfterLogin(){
     whoName.textContent = currentUser.nom || "-";
     whoId.textContent = `(ID ${currentUser.id || "-"})`;
 
-    // load vehicules
     setStatus("", "Chargement des véhicules…", "");
     try{
       const res = await apiVehicules();
@@ -720,7 +690,6 @@
 
       refreshPlaques();
 
-      // if arrival saved -> preselect that arrival vehicle
       const arr = lsGet(LS_ARR);
       if(arr?.vehicule_arrivee_nom){
         const idx = vehicules.findIndex(v => String(v.nom).toLowerCase() === String(arr.vehicule_arrivee_nom).toLowerCase());
@@ -747,14 +716,10 @@
   function logout(){
     lsDel(LS_USER);
     currentUser = null;
-    // On ne supprime pas LS_ARR / LS_SENT ici (si tu veux garder)
     showLogin();
     clearLoginStatus();
   }
 
-  // =====================================================
-  // Events
-  // =====================================================
   vehArr.addEventListener("change", refreshPlaques);
   vehDep.addEventListener("change", refreshPlaques);
 
@@ -796,13 +761,9 @@
     }
   });
 
-  // bind hold buttons
   bindHold(btnArrivee, "arr");
   bindHold(btnDepart, "dep");
 
-  // =====================================================
-  // Boot: auto login if stored
-  // =====================================================
   (function boot(){
     const u = lsGet(LS_USER);
     if(u && u.id){
